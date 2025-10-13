@@ -1,0 +1,4 @@
+user: clevernvs
+password: 123456
+public_key: /home/clevernvs/.ssh/ansible_project_template.pub
+language: pt-br

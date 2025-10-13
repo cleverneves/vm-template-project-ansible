@@ -1,0 +1,18 @@
+user {{ user }} {{ user }} ;
+
+events
+{
+    worker_connections 1024;
+}
+
+http
+{
+    server
+    {
+        root /home/{{ user }}/;
+        location /
+        {
+            index index.html;
+        }
+    }
+}

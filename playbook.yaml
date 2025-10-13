@@ -1,0 +1,70 @@
+---
+- name: Criação do usuário
+  hosts: all
+  remote_user: root
+  vars_files:
+    - variables.yaml
+  tasks:
+    - name: Instalação do pacote Whois
+      ansible.builtin.apt:
+        name: whois
+        state: present
+        update_cache: true
+
+    - name: Gerando a senha criptografada
+      ansible.builtin.shell: "mkpasswd --method=sha-512 {{ password }}"
+      register: cript_pwd
+
+    - name: Verificando a senha criptografada
+      ansible.builtin.debug:
+        msg: "{{ cript_pwd }}"
+
+    - name: Criando o usuário no linux
+      ansible.builtin.user:
+        name: "{{ user }}"
+        shell: /bin/bash
+        groups: sudo
+        append: yes
+        password: "{{ cript_pwd.stdout }}"
+
+    - name: Criando o diretório SSH
+      ansible.builtin.file:
+        path: "/home/{{ user }}/.ssh"
+        state: directory
+        group: "{{ user }}"
+        owner: "{{ user }}"
+        recurse: true
+
+    - name: Copiando a chave SSH
+      ansible.builtin.copy:
+        # Máquina local
+        src: "{{ public_key }}"
+        # Máquina remota
+        dest: "/home/{{ user }}/.ssh/authorized_keys"
+
+- name: Instalação do Nginx e executar de uma página web
+  hosts: all
+  remote_user: "{{ user }}"
+  tasks:
+    - name: Copiando a página web
+      ansible.builtin.copy:
+        src: ./index.html
+        dest: "/home/{{ user }}/index.html"
+
+    - name: Instalando o Nginx
+      become: true
+      ansible.builtin.apt:
+        name: nginx
+        update_cache: true
+
+    - name: Enviando o nginx.conf com a nova configuração
+      become: true
+      ansible.builtin.template:
+        src: ./nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+
+    - name: Reiniciando o serviço nginx
+      become: true
+      ansible.builtin.service:
+        name: nginx
+        state: restarted

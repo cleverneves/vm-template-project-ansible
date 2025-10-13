@@ -1,0 +1,8 @@
+[maquinas]
+157.230.6.188
+157.230.1.16
+198.211.99.52
+
+[maquinas:vars]
+ansible_ssh_private_keys_file=~/.ssh/ansible_project-template
+ansible_become_user=root
