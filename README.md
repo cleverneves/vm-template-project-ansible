@@ -1,7 +1,7 @@
-# Ansible Project Template
-Projeto para Ansible utilizando templates Jinja
+# VM Template Project Ansible 
+Projeto laboratorio de criação de VMs utilizando Ansible e templates Jinja.
 
-# Pré-requisitos:
+# Requisitos:
 
 - Linux
 - Ansible
